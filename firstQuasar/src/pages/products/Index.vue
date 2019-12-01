@@ -2,9 +2,13 @@
   <div class="q-my-xl">
     <q-table
       :data="serverData"
+      row-key="name"
+      :pagination.sync="serverPagination"
+      :loading="loading"
+      @request="request"
       :columns="columns"
-      row-key="id"
       title="List of products"
+      binary-state-sort
     >
       <q-tr slot="body" slot-scope="props" :props="props">
         <q-td key="id" :props="props">
@@ -14,8 +18,11 @@
           <span>{{ props.row.name }}</span>
         </q-td>
         <q-td class="text-right">
-          <q-btn round icon="edit" class="q-mr-xs" @click="$router.push('/products/' + props.row.id + '/edit')" />
-          <q-btn round icon="delete" />
+          <div v-if="props.row.id == 'DELETED'">DELETED</div>
+          <div v-else>
+            <q-btn round icon="edit" class="q-mr-xs" @click="$router.push('/products/' + props.row.id + '/edit')" />
+            <q-btn round icon="delete" @click="destroy(props.row.id, props.row.name, props.row.__index)"/>
+          </div>
         </q-td>
       </q-tr>
     </q-table>
@@ -72,6 +79,32 @@ export default {
           // we tell QTable to exit the "loading" state
           this.loading = false
         })
+    },
+    destroy (id, name, rowIndex) {
+      this.$q.dialog({
+        title: 'Delete',
+        message: 'Are you sure to delete ' + name + '?',
+        color: 'primary',
+        ok: true,
+        cancel: true
+      }).then(() => {
+        axios
+          .delete(`http://127.0.0.1:8000/products/${id}`)
+          .then(() => {
+            this.serverData[rowIndex].id = 'DELETED'
+            this.$q.notify({
+              type: 'positive', timeout: 2000, message: 'The product has been deleted.'
+            })
+          })
+          .catch(error => {
+            this.$q.notify({
+              type: 'negative', timeout: 2000, message: 'An error has been occured.'
+            })
+            console.log(error)
+          })
+      }).catch(() => {
+      // cancel - do nothing?
+      })
     }
   },
   mounted () {
