@@ -13,12 +13,14 @@
 
     <q-page-container>
       <div class="row full-width justify-center">
-        <router-view class="c-container" />
+        <router-view class="c-container"></router-view>
+        <q-ajax-bar />
+        <!--<router-view class="c-container" />-->
       </div>
     </q-page-container>
 
     <q-layout-footer>
-      <div class="text-center q-pa-md">Copyright (C) 2018, Homer Simpson</div>
+      <div class="text-center q-pa-md">Copyright (C) 2018, Alena Valova</div>
     </q-layout-footer>
   </q-layout>
 </template>

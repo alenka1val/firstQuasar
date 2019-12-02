@@ -33,6 +33,16 @@ const routes = [
         component: () => import('pages/products/Edit')
       }
     ]
+  },
+  {
+    path: '/orders',
+    component: () => import('layouts/Main'),
+    children: [
+      {
+        path: 'index',
+        component: () => import('pages/orders/Index')
+      }
+    ]
   }
 ]
 

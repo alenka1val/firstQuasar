@@ -9,6 +9,10 @@
         <q-item-main>Create</q-item-main>
       </q-item>
     </q-list>
+    <div class="q-subheading q-mb-sm">Orders</div>
+    <q-item class="q-body-1" to="/orders/index">
+      <q-item-main>List</q-item-main>
+    </q-item>
   </div>
 </template>
 

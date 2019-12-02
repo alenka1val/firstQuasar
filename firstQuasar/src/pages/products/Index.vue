@@ -17,6 +17,18 @@
         <q-td key="name" :props="props">
           <span>{{ props.row.name }}</span>
         </q-td>
+        <q-td key="on_stock" :props="props">
+          <span>{{ props.row.on_stock }}</span>
+        </q-td>
+        <q-td key="categories" :props="props">
+          <span>{{ props.row.categories }}</span>
+        </q-td>
+        <q-td key="animal" :props="props">
+          <span>{{ props.row.animal }}</span>
+        </q-td>
+        <q-td key="price" :props="props">
+          <span>{{ props.row.price }}</span>
+        </q-td>
         <q-td class="text-right">
           <div v-if="props.row.id == 'DELETED'">DELETED</div>
           <div v-else>
@@ -36,8 +48,12 @@ export default {
   data () {
     return {
       columns: [
-        { name: 'id', label: 'ID', field: 'id', sortable: false, align: 'left' },
+        { name: 'id', label: 'ID', field: 'id', sortable: true, align: 'left' },
         { name: 'name', label: 'Name', field: 'name', sortable: true, align: 'left' },
+        { name: 'on_stock', label: 'On Stock', field: 'on_stock', sortable: true, align: 'left' },
+        { name: 'categories', label: 'Category', field: 'categories', sortable: false, align: 'left' },
+        { name: 'animal', label: 'Animal', field: 'animal', sortable: false, align: 'left' },
+        { name: 'price', label: 'Price', field: 'price', sortable: true, align: 'left' },
         { name: 'actions', label: 'Actions', sortable: false, align: 'right' }
       ],
       selected: [],
