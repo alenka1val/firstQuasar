@@ -4,15 +4,15 @@
       <q-card-title>Create new product</q-card-title>
       <q-card-main>
         <q-field :count="250">
-          <q-input float-label="Name" v-model="productName" max-length="250"  name="name" />
+          <q-input float-label="Name" v-model="productData.name" max-length="250"  name="name" />
         </q-field>
-        <q-select v-model="productAnimal" :options="animals" float-label="Standard" name="animal" :rules="[val => !!val || 'Field is required']" />
-        <q-select v-model="productCategory" :options="categories" float-label="Standard" name="category"/>
+        <q-select v-model="productData.animal" :options="animals" float-label="Standard" name="animal" :rules="[val => !!val || 'Field is required']" />
+        <q-select v-model="productData.category" :options="categories" float-label="Standard" name="category"/>
         <q-input
           filled
           type="number"
           name="price"
-          v-model="productPrice"
+          v-model="productData.price"
           float-label="Price"
           lazy-rules
           :rules="[
@@ -25,7 +25,7 @@
             type="textarea"
             name="description"
             float-label="Description"
-            v-model="productDescription"
+            v-model="productData.description"
             :max-height="100"
             rows="7"
           />
@@ -34,7 +34,7 @@
           filled
           type="number"
           name="onStock"
-          v-model="productOnStock"
+          v-model="productData.on_stock"
           float-label="On Stock"
           lazy-rules
           :rules="[
@@ -43,7 +43,7 @@
         ]"
         />
         <q-field helper="Supported format: JPG, max. file size: 300KiB" class="q-mt-lg">
-          <q-uploader float-label="Images" multiple extensions=".jpg" auto-expand url="http://127.0.0.1:8000/products/upload" hide-upload-button @add = "file_selected"/>
+          <q-uploader float-label="Images" multiple extensions=".jpg" auto-expand url="http://127.0.0.1:8000/products/upload" hide-upload-button hide-upload-progress  @add = "file_selected"/>
         </q-field>
       </q-card-main>
       <q-card-actions class="q-mt-md">
@@ -66,10 +66,17 @@ import axios from 'axios'
 export default {
   data () {
     return {
-      productName: '',
-      productDescription: '',
-      productAnimal: null,
-      productCategory: null,
+      productData: {
+        name: '',
+        description: '',
+        animal: null,
+        category: null,
+        price: null,
+        on_stock: '',
+        file: '',
+        check_if_document_upload: false,
+        fd: ''
+      },
       animals: [
         {
           label: 'Cat',
@@ -97,66 +104,70 @@ export default {
           label: 'Other',
           value: 'stuff'
         }
-      ],
-      productPrice: null,
-      productOnStock: null,
-      parametertName: null,
-      parametertValue: null,
-      model: [],
-      selected_file: '',
-      check_if_document_upload: false,
-      fd: null
+      ]
     }
   },
   methods: {
     file_selected (file) {
-      console.log(file)
-      this.selected_file = file[0]
-      this.check_if_document_upload = true
-    },
-    filesChange (a, b) {
-      this.selected_file = b
+      this.productData.file = file[0]
+      this.productData.check_if_document_upload = true
     },
     createProduct () {
-      if (this.productName === '') {
+      if (this.productData.name === '') {
         this.$q.notify({
           type: 'negative', timeout: 2000, message: 'Please enter Product Name'
         })
       }
-      if (this.productDescription === '') {
+      if (this.productData.description === '') {
         this.$q.notify({
           type: 'negative', timeout: 2000, message: 'Please enter Product Description'
         })
       }
-      if (this.productAnimal === null) {
+      if (this.productData.animal === null) {
         this.$q.notify({
           type: 'negative', timeout: 2000, message: 'Please choose Animal'
         })
       }
-      if (this.productCategory === null) {
+      if (this.productData.category === null) {
         this.$q.notify({
           type: 'negative', timeout: 2000, message: 'Please choose Category'
         })
       }
-      if (this.productPrice === '' || this.productPrice < 0.01) {
+      if (this.productData.price === '' || this.productPrice < 0.01) {
         this.$q.notify({
           type: 'negative', timeout: 2000, message: 'Please enter Product Price'
         })
       }
-      if (this.productOnStock === null) {
+      if (this.productData.on_stock === null) {
         this.$q.notify({
           type: 'negative', timeout: 2000, message: 'Please enter number of products on stock'
         })
       }
-      this.fd = new FormData()
-      this.fd.append('file', this.selected_file, this.selected_file.name)
-      axios.post('http://127.0.0.1:8000/products/upload', this.fd)
+      /* var options = {
+                  showLeafArrayIndexes: true,
+                  includeNullValues: false,
+                  mapping: function (value) {
+                    if (typeof value === 'boolean') {
+                      return +value ? '1' : '0'
+                    }
+                    return value
+                  }
+                }
+                var formData = new FormData() */
+      this.productData.fd = new FormData()
+      this.productData.fd.append('file', this.productData.file, this.productData.file.name)
+      console.log(this.productData)
+      axios.post('http://127.0.0.1:8000/products/upload', this.productData.fd)
         .then(function (response) {
           if (response.data.ok) {
           }
         })
+      console.log(this.productData.fd)
+      var formData = new FormData()
+      formData.append('file', this.productData.file, this.productData.file.name)
+      formData.append('name', this.productData.name)
       axios
-        .post(`http://127.0.0.1:8000/products`, this.productData)
+        .post(`http://127.0.0.1:8000/products`, formData)
         .then(response => {
           this.$q.notify({
             type: 'positive', timeout: 2000, message: 'The product has been created.'
@@ -173,12 +184,7 @@ export default {
         })
     },
     onSubmit () {
-      this.productName.validate()
-    }
-  },
-  computed: {
-    productData: function () {
-      return { name: this.productName, animal: this.productAnimal, category: this.productCategory, price: this.productPrice, description: this.productDescription, onStock: this.productOnStock, file: this.fd }
+      this.productData.productName.validate()
     }
   }
 }
