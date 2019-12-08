@@ -40,6 +40,9 @@
           val => val > 0 && val < 100 || 'Please type a real age'
         ]"
         />
+        <q-field helper="Supported format: JPG, max. file size: 300KiB" class="q-mt-lg">
+          <q-uploader float-label="Images" extensions=".jpg" auto-expand url="http://127.0.0.1:8000/products/upload" hide-upload-button hide-upload-progress @add = "file_selected"/>
+        </q-field>
       </q-card-main>
       <q-card-actions class="q-mt-md">
         <div class="row justify-end full-width docs-btn">
@@ -68,16 +71,33 @@ export default {
       productOnStock: null,
       parametertName: null,
       parametertValue: null,
+      selected_file: '',
+      check_if_document_upload: false,
       model: []
     }
   },
   methods: {
+    file_selected (file) {
+      console.log(file)
+      this.selected_file = file[0]
+      this.check_if_document_upload = true
+    },
     updateProduct () {
       axios
         .put(`http://127.0.0.1:8000/products/` + this.$route.params.id, this.productData)
         .then(response => {
           this.$q.notify({
             type: 'positive', timeout: 2000, message: 'The product has been updated.'
+          })
+          this.fd = new FormData()
+          this.fd.append('file', this.selected_file, this.selected_file.name)
+          axios.post('http://127.0.0.1:8000/products/' + response.data.id + '/upload', this.fd)
+            .then(function (response) {
+              if (response.data.ok) {
+              }
+            })
+          this.$router.push({
+            path: '/products/' + response.data.id + '/edit'
           })
         })
         .catch(error => {

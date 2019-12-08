@@ -43,7 +43,7 @@
         ]"
         />
         <q-field helper="Supported format: JPG, max. file size: 300KiB" class="q-mt-lg">
-          <q-uploader float-label="Images" multiple extensions=".jpg" auto-expand url="http://127.0.0.1:8000/products/upload" hide-upload-button @add = "file_selected"/>
+          <q-uploader float-label="Images" extensions=".jpg" auto-expand url="http://127.0.0.1:8000/products/upload" hide-upload-button hide-upload-progress @add = "file_selected"/>
         </q-field>
       </q-card-main>
       <q-card-actions class="q-mt-md">
@@ -113,9 +113,6 @@ export default {
       console.log(file)
       this.selected_file = file[0]
       this.check_if_document_upload = true
-    },
-    filesChange (a, b) {
-      this.selected_file = b
     },
     createProduct () {
       if (this.productName === '') {
