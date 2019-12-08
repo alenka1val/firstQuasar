@@ -34,7 +34,7 @@
           filled
           type="number"
           name="onStock"
-          v-model="productOnStock"
+          v-model="on_stock"
           float-label="On Stock"
           lazy-rules
           :rules="[
@@ -99,7 +99,7 @@ export default {
         }
       ],
       productPrice: null,
-      productOnStock: null,
+      on_stock: null,
       parametertName: null,
       parametertValue: null,
       model: [],
@@ -143,24 +143,25 @@ export default {
           type: 'negative', timeout: 2000, message: 'Please enter Product Price'
         })
       }
-      if (this.productOnStock === null) {
+      if (this.on_stock === null) {
         this.$q.notify({
           type: 'negative', timeout: 2000, message: 'Please enter number of products on stock'
         })
       }
-      this.fd = new FormData()
-      this.fd.append('file', this.selected_file, this.selected_file.name)
-      axios.post('http://127.0.0.1:8000/products/upload', this.fd)
-        .then(function (response) {
-          if (response.data.ok) {
-          }
-        })
       axios
         .post(`http://127.0.0.1:8000/products`, this.productData)
         .then(response => {
           this.$q.notify({
             type: 'positive', timeout: 2000, message: 'The product has been created.'
           })
+          console.log('http://127.0.0.1:8000/products/' + response.data.id + '/upload')
+          this.fd = new FormData()
+          this.fd.append('file', this.selected_file, this.selected_file.name)
+          axios.post('http://127.0.0.1:8000/products/' + response.data.id + '/upload', this.fd)
+            .then(function (response) {
+              if (response.data.ok) {
+              }
+            })
           this.$router.push({
             path: '/products/' + response.data.id + '/edit'
           })
@@ -178,7 +179,7 @@ export default {
   },
   computed: {
     productData: function () {
-      return { name: this.productName, animal: this.productAnimal, category: this.productCategory, price: this.productPrice, description: this.productDescription, onStock: this.productOnStock, file: this.fd }
+      return { name: this.productName, animal: this.productAnimal, category: this.productCategory, price: this.productPrice, description: this.productDescription, on_stock: this.on_stock }
     }
   }
 }
